@@ -1,0 +1,7 @@
+environment/
+rootfs*/
+*.sif
+tmp.prototxt
+
+caffe/
+images/
