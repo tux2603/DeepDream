@@ -15,15 +15,15 @@ if __name__ == '__main__':
 
     # General arguments to control the generation of the dreams
     parser.add_argument('-g', '--guide', help='Guide image for stylistic suggestions', default=None)
-    parser.add_argument('-n', '--num-iterations', help='The number of times to run the dream algorithm', default=5, type=int)
+    parser.add_argument('-n', '--num-iterations', help='The number of times to run the dream algorithm', default=1, type=int)
 
     # Special purpose arguments to control the generation of the dreams
     parser.add_argument('--octave-count', help='The number of octaves to run per iteration', default=4, type=int)
     parser.add_argument('--octave-scale', help='The amount to scale each subsequent octave by', default=1.3, type=float)
     parser.add_argument('--steps-per-octave', help='The number of algorithm steps to run per octave', default=10, type=int)
-    parser.add_argument('--maximize', help='The layer in the neural net to maximize', default='inception_4c/output')
-    parser.add_argument('--jitter', help='The amount of jitter to add to each step during image processing', default=32, type=int)
-    parser.add_argument('--blend', help='The amount to blend the previous frame into the current one. Helps stabilize videos', action='store_true', default=False)
+    parser.add_argument('--maximize', '-m', help='The layer in the neural net to maximize', default='inception_4c/output')
+    parser.add_argument('--jitter', '-j', help='The amount of jitter to add to each step during image processing', default=32, type=int)
+    parser.add_argument('--blend', '-b', help='The amount to blend the previous frame into the current one. Helps stabilize videos', action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -89,9 +89,6 @@ if __name__ == '__main__':
 
     if args.guide is not None:
         commandArgs.append('--use-guide')
-
-    if args.use_sudo:
-        commandArgs.insert(0, 'sudo')
 
     
     commandArgs = [str(i) for i in commandArgs]
