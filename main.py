@@ -25,9 +25,6 @@ if __name__ == '__main__':
     parser.add_argument('--jitter', help='The amount of jitter to add to each step during image processing', default=32, type=int)
     parser.add_argument('--blend', help='The amount to blend the previous frame into the current one. Helps stabilize videos', action='store_true', default=False)
 
-    # Just a flag that I added because my singularity install wants sudo
-    parser.add_argument('--use-sudo', help='Run singularity with sudo, because for some odd reason my local system isn\'t happy if you don\'t', action='store_true', default=False,)
-
     args = parser.parse_args()
 
     # The model will be run in singularity, so check to make sure it's present
