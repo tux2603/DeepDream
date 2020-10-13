@@ -3,5 +3,7 @@ rootfs*/
 *.sif
 tmp.prototxt
 
+exampleImages/
 caffe/
-images/
+
+.vscode/

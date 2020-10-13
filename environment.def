@@ -19,10 +19,10 @@ From:nvidia/cuda:11.1-cudnn8-runtime-ubuntu18.04
     bash ~/condaInstall.sh -b -p /opt/miniconda/
 
     export CMAKE_PREFIX_PATH=/opt/miniconda
-	export CUDA_HOME=/usr/local/cuda-11.1/ 
+	export CUDA_HOME=/usr/local/cuda-11.1/
 	export PATH=/opt/miniconda/bin/:$PATH
 
     conda update -y -n base conda
     conda install -y python=3.7
     conda install -y -c anaconda caffe-gpu
-    conda install -y numpy scipy pillow ipython protobuf
+    conda install -y numpy scipy pillow ipython protobuf numba
