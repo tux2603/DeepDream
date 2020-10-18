@@ -147,9 +147,10 @@ if __name__ == '__main__':
     model = caffe.io.caffe_pb2.NetParameter()
     text_format.Merge(open(netFileName).read(), model)
     model.force_backward = True
-    open('tmp.prototxt', 'w').write(str(model))
 
-    net = caffe.Classifier('tmp.prototxt', parametersFile,
+    # What is the purpose of writing to a file only to read back in immediately?
+    open('/tmp/tmp.prototxt', 'w').write(str(model))
+    net = caffe.Classifier('/tmp/tmp.prototxt', parametersFile,
         mean = np.float32([104.0, 116.0, 122.0]), # ImageNet mean, training set dependent
         channel_swap = (2,1,0)) # the reference model has channels in BGR order instead of RGB
     
@@ -195,6 +196,6 @@ if __name__ == '__main__':
             
         result = PIL.Image.fromarray(img.astype('uint8'))
         print('\n  rendering final image...')
-        result.save(f'/opt/images/destination/{imgName}')
+        result.save(f'/tmp/images/destination/{imgName}')
         print('  done')
         lastImage = img

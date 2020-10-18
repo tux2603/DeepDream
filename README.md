@@ -47,4 +47,6 @@ You can try though! Let me know if you get it working.
 - **GPU selection**: Select what GPU (or GPUs if I get multi-GPU working) you want the model to use in multi-GPU systems
 - **Better blend options**: Right now the blend factor is just randomly selected each frame. It would be nice to include things like constant factors or Gaussian distributions
 - **Style transfers**: Spaghetti videos! I need to find the models for this...
-- **Windows/Mac* support**: This will require some basic restructuring of the `src/dream.py` file to allow it to be run outside of the container, or for windows and mac users to figure out how to run singularity
+- **Windows/Mac support**: This will require some basic restructuring of the `src/dream.py` file to allow it to be run outside of the container, or for windows and mac users to figure out how to run singularity
+- **Single Image Support**: For when you only want to process a single image instead of a whole directory
+- **Support for other image formats**: Currently the program only supports jpegs... :(

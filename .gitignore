@@ -1,8 +1,7 @@
 environment/
 rootfs*/
-*.sif
-tmp.prototxt
 
+*.sif
 exampleImages/
 caffe/
 

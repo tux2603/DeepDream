@@ -72,7 +72,7 @@ if __name__ == '__main__':
         commandArgs.extend(['-B', f'{args.guide}:/opt/images/guideImage.jpg'])
     
     # Add the container and command to be run
-    commandArgs.extend(['caffe.sif', '/opt/src/dream.py'])
+    commandArgs.extend(['caffe.sif', './dream.py'])
 
     # Pass all the necessary arguments down the line
     commandArgs.extend([
