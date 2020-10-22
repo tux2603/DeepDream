@@ -18,13 +18,13 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--num-iterations', help='The number of times to run the dream algorithm', default=1, type=int)
 
     # Special purpose arguments to control the generation of the dreams
+    parser.add_argument('--blend', '-b', help='The amount to blend the previous frame into the current one. Helps stabilize videos', action='store_true', default=False)
+    parser.add_argument('--jitter', '-j', help='The amount of jitter to add to each step during image processing', default=32, type=int)
+    parser.add_argument('--maximize', '-m', help='The layer in the neural net to maximize', default='inception_4c/output')
+    parser.add_argument('--no-gpu', help='Disables any attempt to run the container on GPU and forces the neural net to use CPU instead', action='store_true', default=False)
     parser.add_argument('--octave-count', help='The number of octaves to run per iteration', default=4, type=int)
     parser.add_argument('--octave-scale', help='The amount to scale each subsequent octave by', default=1.3, type=float)
     parser.add_argument('--steps-per-octave', help='The number of algorithm steps to run per octave', default=10, type=int)
-    parser.add_argument('--maximize', '-m', help='The layer in the neural net to maximize', default='inception_4c/output')
-    parser.add_argument('--jitter', '-j', help='The amount of jitter to add to each step during image processing', default=32, type=int)
-    parser.add_argument('--blend', '-b', help='The amount to blend the previous frame into the current one. Helps stabilize videos', action='store_true', default=False)
-
     args = parser.parse_args()
 
     # The model will be run in singularity, so check to make sure it's present
@@ -57,10 +57,13 @@ if __name__ == '__main__':
         print(f'Guide image must be a jpeg')
         exit(1)
 
-    commandArgs = ['singularity', 'exec']
+    commandArgs = ['singularity', 'exec', '--writable-tmpfs']
 
     # Add nvidia GPU support and set the working directory
-    commandArgs.extend(['--nv', '--pwd=/opt/src'])
+    commandArgs.append('--pwd=/opt/src')
+
+    if not args.no_gpu:
+        commandArgs.append('--nv')
 
     # Bind all of the necessary directories
     commandArgs.extend(['-B', 'caffe/models:/opt/models'])
@@ -72,7 +75,7 @@ if __name__ == '__main__':
         commandArgs.extend(['-B', f'{args.guide}:/opt/images/guideImage.jpg'])
     
     # Add the container and command to be run
-    commandArgs.extend(['caffe.sif', './dream.py'])
+    commandArgs.extend(['caffe.sif', 'conda', 'run', '--no-capture-output', '-n', 'cpu' if args.no_gpu else 'gpu', './dream.py'])
 
     # Pass all the necessary arguments down the line
     commandArgs.extend([
@@ -84,6 +87,9 @@ if __name__ == '__main__':
         '--jitter', args.jitter
         ])
 
+    if args.no_gpu:
+        commandArgs.append('--no-gpu')
+        
     if args.blend:
         commandArgs.append('--blend')  
 

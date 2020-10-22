@@ -125,6 +125,7 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--num-iterations', help='The number of times to run the dream algorithm', default=5, type=int)
     parser.add_argument('--octave-count', help='The number of octaves to run per iteration', default=4, type=int)
     parser.add_argument('--octave-scale', help='The amount to scale each subsequent octave by', default=1.3, type=float)
+    parser.add_argument('--no-gpu', help='Disables any attempt to run the container on GPU and forces the neural net to use CPU instead', action='store_true', default=False)
     parser.add_argument('--steps-per-octave', help='The number of algorithm steps to run per octave', default=10, type=int)
     parser.add_argument('--maximize', help='The layer in the neural net to maximize', default='inception_4c/output')
     parser.add_argument('--jitter', help='The amount of jitter to add to each step during image processing', default=32, type=int)
@@ -133,10 +134,16 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    caffe.set_mode_gpu()
+    if not args.no_gpu:
+        print('Using GPU')
+        caffe.set_mode_gpu()
 
-    # TODO: Add a command line argument to specify CUDA device
-    caffe.set_device(0) 
+        # TODO: Add a command line argument to specify CUDA device
+        caffe.set_device(0) 
+    
+    else:
+        print('Using CPU')
+        caffe.set_mode_cpu()
 
     modelPath = '/opt/models/bvlc_googlenet/' # substitute your path here
     netFileName   = modelPath + 'deploy.prototxt'
@@ -196,6 +203,6 @@ if __name__ == '__main__':
             
         result = PIL.Image.fromarray(img.astype('uint8'))
         print('\n  rendering final image...')
-        result.save(f'/tmp/images/destination/{imgName}')
+        result.save(f'/opt/images/destination/{imgName}')
         print('  done')
         lastImage = img
