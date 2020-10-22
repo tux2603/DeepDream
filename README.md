@@ -5,7 +5,7 @@ A containerized approach to making your own deep dream images
 ## Dependencies
 
 The only dependencies for this project are [singularity](https://sylabs.io/guides/3.6/user-guide/quick_start.html#quick-installation-steps),
-an nvidia GPU with CUDA support (I'm working on a CPU only version, but it's not done yet), and an internet connection. The actual ML frameworks are
+Python 3.5 or newer, an nvidia GPU with CUDA support (I'm working on a CPU only version, but it's not done yet), and an internet connection. The actual ML frameworks are
 installed and managed by the singularity virtual environment, removing the need to install them on your system.
 
 ## Set Up
