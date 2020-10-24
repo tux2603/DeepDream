@@ -3,6 +3,6 @@ rootfs*/
 
 *.sif
 exampleImages/
-caffe/
+bvlc_googlenet/
 
 .vscode/

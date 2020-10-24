@@ -67,8 +67,6 @@ def getProgress(numIters, currentIter, numOctaves, currentOctave, numFrames, cur
     progress = currentIter + currentOctave * numIters + currentFrame * numOctaves * numIters
     return 100 * progress / totalPasses
 
-
-
 def deepdream(net, baseImage, stepsPerOctave=10, numOctaves=4, octaveScale=1.4, 
               end='inception_4c/output', clip=True, numFrames=1, currentFrame=0, **step_params):
     # prepare base images for all octaves
@@ -119,7 +117,7 @@ def blend(img1, img2, blendFactor):
 
     return blendedImage
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-n', '--num-iterations', help='The number of times to run the dream algorithm', default=5, type=int)
@@ -145,9 +143,8 @@ if __name__ == '__main__':
         print('Using CPU')
         caffe.set_mode_cpu()
 
-    modelPath = '/opt/models/bvlc_googlenet/' # substitute your path here
-    netFileName   = modelPath + 'deploy.prototxt'
-    parametersFile = modelPath + 'bvlc_googlenet.caffemodel'
+    netFileName  = '/opt/model/deploy.prototxt'
+    parametersFile ='/opt/model/model.caffemodel'
 
     # Patching model to be able to compute gradients.
     # Note that you can also manually add "force_backward: true" line to "deploy.prototxt".
@@ -206,3 +203,7 @@ if __name__ == '__main__':
         result.save(f'/opt/images/destination/{imgName}')
         print('  done')
         lastImage = img
+
+
+if __name__ == '__main__':
+    main()

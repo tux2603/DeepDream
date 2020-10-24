@@ -17,10 +17,13 @@ if __name__ == '__main__':
     parser.add_argument('-g', '--guide', help='Guide image for stylistic suggestions', default=None)
     parser.add_argument('-n', '--num-iterations', help='The number of times to run the dream algorithm', default=1, type=int)
 
+    parser.add_argument('-m', '--model', help='The caffe model to be used for the generation of dreams', default='bvlc_googlenet/bvlc_googlenet.caffemodel')
+    parser.add_argument('-p', '--prototext', help='The prototext for the specified caffe model', default='bvlc_googlenet/deploy.prototxt')
+
     # Special purpose arguments to control the generation of the dreams
     parser.add_argument('--blend', '-b', help='The amount to blend the previous frame into the current one. Helps stabilize videos', action='store_true', default=False)
     parser.add_argument('--jitter', '-j', help='The amount of jitter to add to each step during image processing', default=32, type=int)
-    parser.add_argument('--maximize', '-m', help='The layer in the neural net to maximize', default='inception_4c/output')
+    parser.add_argument('--maximize', '-l', help='The layer in the neural net to maximize', default='inception_4c/output')
     parser.add_argument('--no-gpu', help='Disables any attempt to run the container on GPU and forces the neural net to use CPU instead', action='store_true', default=False)
     parser.add_argument('--octave-count', help='The number of octaves to run per iteration', default=4, type=int)
     parser.add_argument('--octave-scale', help='The amount to scale each subsequent octave by', default=1.3, type=float)
@@ -66,7 +69,8 @@ if __name__ == '__main__':
         commandArgs.append('--nv')
 
     # Bind all of the necessary directories
-    commandArgs.extend(['-B', 'caffe/models:/opt/models'])
+    commandArgs.extend(['-B', f'{args.model}:/opt/model/model.caffemodel'])
+    commandArgs.extend(['-B', f'{args.prototext}:/opt/model/deploy.prototxt'])
     commandArgs.extend(['-B', 'src:/opt/src'])
     commandArgs.extend(['-B', f'{args.source}:/opt/images/source'])
     commandArgs.extend(['-B', f'{args.destination}:/opt/images/destination'])
