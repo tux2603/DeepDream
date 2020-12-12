@@ -37,11 +37,35 @@ program will then automatically bind all the necessary directories to the singul
 | `--source`           | `-s`       | Directory     | None, must be set                          | Selects the directory that raw images will be read from                                                                                                                                                              |
 | `--steps-per-octave` |            | Integer       | 10                                         | The number of min-max steps to take on each individual octave during image generation. Has a similar effect to `--num-iterations`, but is applied in a different order                                               |
 
-## If you're on Windows or Mac
+## Running on Windows
 
-Uhhhhhhh.... have fun. I make no guarantee that this project will work for you. ¯\\\_(ツ)\_/¯
+If you're okay with running CPU-only models, you can install WSL2 and set up singularity in it and proceed with life as normal. If 
 
-You can try though! Let me know if you get it working.
+If you want to run GPU based models, you will first need to install all of the dependencies:
+
+- **CUDA**: available for download with instructions from [nvidia's website](https://developer.nvidia.com/cuda-downloads)
+- **Anaconda**: available [here](https://www.anaconda.com/products/individual)
+- **caffe-gpu**: Installable through anaconda
+- **numpy**: Installable through anaconda
+- **scipy**: Installable through anaconda
+- **pillow**: Installable through anaconda
+- **ipython**: Installable through anaconda
+- **protobuf**: Installable through anaconda
+- **numba**: Installable through anaconda
+
+Once the dependencies are installed, you can run the model directly, bypassing singularity using the `src/dream.py` file. Note that you wll need to supply the following arguments:
+
+- **--prototext**: The path the the proto text of the caffe model, usually has file extension of `.prototxt` or `.prototxt`, but this can vary.
+- **--caffemodel**: The path to the model data for the caffe model, usually has file extension of `.caffemodel`, but this can vary.
+- **--source**: The path to the folder of all images that should be processed
+- **--destination**: The path to the folder where the processed images should be saved
+
+Other options are optional and can be used to fine tune image generation
+## Running on Mac
+
+Uhhhhhhh.... have fun. I make no guarantee that this project will work for you, but the steps listed in the "running on windows" section _should_ work for you ¯\\\_(ツ)\_/¯
+
+Let me know if you get it working.
 
 ## TODO's
 
@@ -49,6 +73,5 @@ You can try though! Let me know if you get it working.
 - **GPU selection**: Select what GPU (or GPUs if I get multi-GPU working) you want the model to use in multi-GPU systems
 - **Better blend options**: Right now the blend factor is just randomly selected each frame. It would be nice to include things like constant factors or Gaussian distributions
 - **Style transfers**: Spaghetti videos! I need to find the models for this...
-- **Windows/Mac support**: This will require some basic restructuring of the `src/dream.py` file to allow it to be run outside of the container, or for windows and mac users to figure out how to run singularity
 - **Single Image Support**: For when you only want to process a single image instead of a whole directory
 - **Support for other image formats**: Currently the program only supports jpegs... :(
