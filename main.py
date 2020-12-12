@@ -28,7 +28,17 @@ if __name__ == '__main__':
     parser.add_argument('--octave-count', help='The number of octaves to run per iteration', default=4, type=int)
     parser.add_argument('--octave-scale', help='The amount to scale each subsequent octave by', default=1.3, type=float)
     parser.add_argument('--steps-per-octave', help='The number of algorithm steps to run per octave', default=10, type=int)
+    
+    # Control of what GPUs are to be used
+    parser.add_argument('--use-gpu', help='Specify the id of a CUDA device to be used by the network. This flag can be given multiple times to enable multi-gpu', action='append', type=int)
+
+
     args = parser.parse_args()
+
+    # If no GPU was given, use the default one
+    if args.use_gpu is None:
+        args.use_gpu = ['0']
+
 
     # The model will be run in singularity, so check to make sure it's present
     if which('singularity') is None:
@@ -93,6 +103,10 @@ if __name__ == '__main__':
 
     if args.no_gpu:
         commandArgs.append('--no-gpu')
+
+    else:
+        for gpuID in args.use_gpu:
+            commandArgs.extend(['--use-gpu', gpuID])
         
     if args.blend:
         commandArgs.append('--blend')  

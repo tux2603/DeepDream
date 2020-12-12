@@ -12,6 +12,8 @@ from numba import jit, prange
 import numpy as np
 import PIL.Image
 import scipy.ndimage as nd
+import tempfile
+import os
 
 
 # a couple of utility functions for converting to and from Caffe's input image layout
@@ -128,7 +130,15 @@ def main():
     parser.add_argument('--maximize', help='The layer in the neural net to maximize', default='inception_4c/output')
     parser.add_argument('--jitter', help='The amount of jitter to add to each step during image processing', default=32, type=int)
     parser.add_argument('--use-guide', help='Whether or not to use a guide image for context', default=False, action='store_true')
+    parser.add_argument('--use-gpu', help='Specifies a GPU ID to use. May be used multiple times to specify a list of GPUs', action='append', type=int)
     parser.add_argument('--blend', help='The amount to blend the previous frame into the current one', action='store_true', default=False)
+
+    # Arguments for if you're running outside of the container
+    parser.add_argument('--prototext', help='The path to the model\'s prototext information', default='/opt/model/deploy.prototxt', type=str)
+    parser.add_argument('--caffemodel', help='The path to the actual model data', default='/opt/model/model.caffemodel', type=str)
+    parser.add_argument('--source', help='The path that the model reads all the images from', default='/opt/images/source', type=str)
+    parser.add_argument('--destination', help='The path that the model will write processed images to', default='/opt/images/destination', type=str)
+    parser.add_argument('--guide-image', help='Specifies a path for the guide image if it\'s being used', default='/opt/images/guideImage.jpg', type=str)
 
     args = parser.parse_args()
 
@@ -143,8 +153,8 @@ def main():
         print('Using CPU')
         caffe.set_mode_cpu()
 
-    netFileName  = '/opt/model/deploy.prototxt'
-    parametersFile ='/opt/model/model.caffemodel'
+    netFileName  = args.prototext
+    parametersFile = args.caffemodel
 
     # Patching model to be able to compute gradients.
     # Note that you can also manually add "force_backward: true" line to "deploy.prototxt".
@@ -153,20 +163,21 @@ def main():
     model.force_backward = True
 
     # What is the purpose of writing to a file only to read back in immediately?
-    open('/tmp/tmp.prototxt', 'w').write(str(model))
-    net = caffe.Classifier('/tmp/tmp.prototxt', parametersFile,
-        mean = np.float32([104.0, 116.0, 122.0]), # ImageNet mean, training set dependent
-        channel_swap = (2,1,0)) # the reference model has channels in BGR order instead of RGB
+    with tempfile.NamedTemporaryFile(mode='w+') as f:
+        f.write(str(model))
+        net = caffe.Classifier(f.name, parametersFile,
+            mean = np.float32([104.0, 116.0, 122.0]), # ImageNet mean, training set dependent
+            channel_swap = (2,1,0)) # the reference model has channels in BGR order instead of RGB
     
     # Load in a list of images to be processed
     imgNames = []
-    imgNames.extend(['/'.join(i.split('/')[4:]) for i in glob('/opt/images/source/*.jpg')])
-    imgNames.extend(['/'.join(i.split('/')[4:]) for i in glob('/opt/images/source/*.jpeg')])
+    imgNames.extend(glob(os.path.join(args.source, '*.jpg')))
+    imgNames.extend(glob(os.path.join(args.source, '*.jpeg')))
 
     imgNames.sort()
 
     if args.use_guide:
-        guide = np.float32(PIL.Image.open('/opt/images/guideImage.jpg'))
+        guide = np.float32(PIL.Image.open(args.guide_image))
         h, w = guide.shape[:2]
         src, dst = net.blobs['data'], net.blobs[args.maximize]
         src.reshape(1,3,h,w)
@@ -189,7 +200,7 @@ def main():
 
     for imgName in imgNames:
         print(f'\n\033[1mProcessing {imgName}\033[0m')
-        img = np.float32(PIL.Image.open(f'/opt/images/source/{imgName}'))
+        img = np.float32(PIL.Image.open(imgName))
 
         if lastImage is not None and args.blend:
             print('  Blending previous frame')
@@ -200,7 +211,7 @@ def main():
             
         result = PIL.Image.fromarray(img.astype('uint8'))
         print('\n  rendering final image...')
-        result.save(f'/opt/images/destination/{imgName}')
+        result.save(imgName.replace(args.source, args.destination))
         print('  done')
         lastImage = img
 
